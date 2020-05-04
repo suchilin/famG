@@ -1,0 +1,62 @@
+version: '3.5'
+
+services:
+  front:
+    container_name: front
+    build: ./front/
+    image: front:v1
+    command: yarn serve
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    ports:
+      - "8081:8080"
+    networks:
+      - goapinet
+  api:
+    container_name: api
+    build: ./back/
+    image: api:v1
+    volumes:
+      - ./back/:/app
+    ports:
+      - "8080:80"
+    networks:
+      - goapinet
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres_goapi:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - goapinet
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-suchilin@gmail.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-secret}
+    volumes:
+      - pgadmin_goapi:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - goapinet
+    restart: unless-stopped
+
+networks:
+  goapinet:
+    driver: bridge
+
+volumes:
+    postgres_goapi:
+    pgadmin_goapi:
