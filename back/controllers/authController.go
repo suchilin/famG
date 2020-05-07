@@ -34,8 +34,13 @@ var Authenticate = func(w http.ResponseWriter, r *http.Request) {
 	resp, ok := models.Login(account.Username, account.Password)
 
 	if ok {
-		app.SetAccessCookie(account.ID, w)
-		app.SetRefreshCookie(account.ID, w)
+		app.SetAccessCookie(account.Username, account.ID, w)
+		app.SetRefreshCookie(account.Username, account.ID, w)
 	}
 	u.Respond(w, resp)
+}
+
+var SignOut = func(w http.ResponseWriter, r *http.Request){
+	app.ClearSession(w)
+	u.Message(200, "Log Out sucefull")
 }

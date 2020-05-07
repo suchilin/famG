@@ -3,7 +3,7 @@ import { log, saveSession } from '../../utils';
 
 export const login = async (username, password) => {
   try {
-    const { data } = await axios.post('/auth/token', {
+    const { data } = await axios.post('/auth/login', {
       username,
       password
     });
@@ -15,5 +15,5 @@ export const login = async (username, password) => {
 };
 
 export const logout = async ()=>{
-  return axios.get('/auth/token')
+  return axios.get('/auth/logout')
 }

@@ -13,16 +13,20 @@ services:
       - "8081:8080"
     networks:
       - goapinet
-  api:
-    container_name: api
+    environment:
+      - VIRTUAL_HOST=front.suchil.dev
+  back:
+    container_name: back
     build: ./back/
-    image: api:v1
+    image: back:v1
     volumes:
       - ./back/:/app
     ports:
       - "8080:80"
     networks:
       - goapinet
+    environment:
+      - VIRTUAL_HOST=back.suchil.dev
 
   postgres:
     container_name: postgres
@@ -52,6 +56,28 @@ services:
     networks:
       - goapinet
     restart: unless-stopped
+  dnsmasq:
+    container_name: dnsmasq
+    image: andyshinn/dnsmasq:latest
+    command: --log-queries --log-facility=- --address=/suchil.dev/127.0.0.1
+    ports:
+      - 53:53
+      - 53:53/udp
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - goapinet
+  nginx-proxy:
+    container_name: ngix-proxy
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs:ro
+    networks:
+      - goapinet
 
 networks:
   goapinet:

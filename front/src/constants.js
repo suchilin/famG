@@ -1,1 +1,1 @@
-export const BASE_URL='http://api'
+export const BASE_URL='https://back.suchil.dev'
