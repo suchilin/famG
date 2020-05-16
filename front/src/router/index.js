@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import Login from '../views/auth/Login.vue';
+import Categories from '../views/Categories.vue';
 import store from '../store';
 
 Vue.use(VueRouter);
@@ -10,33 +11,34 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
   },
   {
     path: '/home',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: {
+      private: true,
+    },
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
+    path: '/categories',
+    name: 'Categories',
+    component: Categories,
+    meta: {
+      private: true,
+    },
+  },
 ];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
 });
 
 router.beforeEach((to, from, next) => {
-  let privateRoutes = ['/', '/home'];
-  if (privateRoutes.includes(to.fullPath)) {
+  if (to.matched.some((record) => record.meta.private)) {
     if (!store.state.auth.authenticated) {
       return next('/login');
     }

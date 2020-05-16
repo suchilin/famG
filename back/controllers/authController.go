@@ -40,6 +40,11 @@ var Authenticate = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 
+var IsAuthenticated = func(w http.ResponseWriter, r *http.Request) {
+	resp:=u.Message(200, "ok")
+	u.Respond(w, resp)
+}
+
 var SignOut = func(w http.ResponseWriter, r *http.Request){
 	app.ClearSession(w)
 	u.Message(200, "Log Out sucefull")

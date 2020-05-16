@@ -1,11 +1,25 @@
-import { login, logout } from '../../../api/auth';
+import { login, logout, isAuthenticated } from '../../../api/auth';
 import router from '../../../router';
 import { getLocalAccessToken, log } from '../../../utils';
+
 export const doLogin = async ({ commit }, credentials) => {
   commit('authFetching', true);
   try {
     const { username, password } = credentials;
     await login(username, password);
+    commit('onAuthSuccess');
+    commit('authFetching', false);
+    router.push('/home');
+  } catch (error) {
+    commit('onAuthFailure', error);
+    commit('authFetching', false);
+  }
+};
+
+export const checkLogin = async ({ commit }) => {
+  commit('authFetching', true);
+  try {
+    await isAuthenticated()
     commit('onAuthSuccess');
     commit('authFetching', false);
     router.push('/home');
@@ -23,11 +37,11 @@ export const fetchLocalAccessToken = ({ commit }) => {
 };
 
 export const doLogout = async ({ commit }) => {
-  try{
-    await logout()
+  try {
+    await logout();
     commit('onLogout');
     router.push('/login');
-  }catch(err){
-    log('ERROR ON LOGOUT', err)
+  } catch (err) {
+    log('ERROR ON LOGOUT', err);
   }
-}
+};

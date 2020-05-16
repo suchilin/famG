@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   front:
-    container_name: front
+    container_name: famgFront
     build: ./front/
     image: front:v1
     command: yarn serve
@@ -16,7 +16,7 @@ services:
     environment:
       - VIRTUAL_HOST=front.suchil.dev
   back:
-    container_name: back
+    container_name: famgBack
     build: ./back/
     image: back:v1
     volumes:

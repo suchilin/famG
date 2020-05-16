@@ -5,6 +5,9 @@
       <v-spacer />
     </v-toolbar>
     <v-card-text>
+      <v-alert type="error" v-if="loginError !== null">
+        {{ loginError }}
+      </v-alert>
       <v-form>
         <v-text-field
           label="Login"
@@ -39,18 +42,19 @@ import { mapState, mapActions } from 'vuex';
 export default {
   data: () => ({
     username: '',
-    password: ''
+    password: '',
   }),
   computed: {
     ...mapState('auth', {
-      isAuth: state => state.authenticated
-    })
+      isAuth: (state) => state.authenticated,
+      loginError: (state) => state.error,
+    }),
   },
   methods: {
     submit() {
       this.doLogin({ username: this.username, password: this.password });
     },
-    ...mapActions('auth', ['doLogin'])
-  }
+    ...mapActions('auth', ['doLogin']),
+  },
 };
 </script>
