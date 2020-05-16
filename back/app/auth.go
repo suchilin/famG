@@ -54,10 +54,11 @@ func generateRefreshToken(sub string, userId uint) string {
 func SetAccessCookie(sub string, userId uint, response http.ResponseWriter) {
 	access_token := generateAccessToken(sub, userId)
 	cookie := &http.Cookie{
-		Name:   "access",
-		Value:  access_token,
-		Path:   "/",
-		MaxAge: 3600,
+		Name:     "access",
+		Value:    access_token,
+		Path:     "/",
+		MaxAge:   1800,
+		HttpOnly: true,
 	}
 	http.SetCookie(response, cookie)
 }
@@ -65,10 +66,11 @@ func SetAccessCookie(sub string, userId uint, response http.ResponseWriter) {
 func SetRefreshCookie(sub string, userId uint, response http.ResponseWriter) {
 	refresh_token := generateRefreshToken(sub, userId)
 	cookie := &http.Cookie{
-		Name:   "refresh",
-		Value:  refresh_token,
-		Path:   "/",
-		MaxAge: 5 * 24 * 15,
+		Name:     "refresh",
+		Value:    refresh_token,
+		Path:     "/",
+		MaxAge:   3600 * 24 * 15,
+		HttpOnly: true,
 	}
 	http.SetCookie(response, cookie)
 }
@@ -105,33 +107,25 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			}
 		}
 
-		cookie, _ := r.Cookie("access")
+		cookie, err := r.Cookie("access")
+		fmt.Println("ERROR", err)
+		cvalue := ""
+		if err == nil {
+			cvalue = cookie.Value
+		}
 
-		// response := make(map[string]interface{})
-		// tokenHeader := r.Header.Get("Authorization")
-		// if tokenHeader == "" {
-		//         response = u.Message(422, "Missing auth token")
-		//         u.Respond(w, response)
-		//         return
-		// }
-		//
-		// splitted := strings.Split(tokenHeader, " ")
-		// if len(splitted) != 2 {
-		//         response = u.Message(422, "Invalid/Malformed auth token")
-		//         u.Respond(w, response)
-		//         return
-		// }
-		//
 		tk := &Token{}
 
-		token, err := jwt.ParseWithClaims(cookie.Value, tk, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(cvalue, tk, func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("token_password")), nil
 		})
 
-		if token.Valid {
-			ctx := context.WithValue(r.Context(), "user", tk.UserId)
-			r = r.WithContext(ctx)
-			next.ServeHTTP(w, r)
+		if err == nil {
+			if token.Valid{
+				ctx := context.WithValue(r.Context(), "user", tk.UserId)
+				r = r.WithContext(ctx)
+				next.ServeHTTP(w, r)
+			}
 		} else if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				response := u.Message(http.StatusBadRequest, "That's not even a token")
@@ -141,6 +135,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 				fmt.Println("REFRESHING TOKEN")
 				// Token is either expired or not active yet
 				rcookie, _ := r.Cookie("refresh")
+				fmt.Println("REFRESH COOKIE", rcookie)
 				rtoken, _ := jwt.ParseWithClaims(rcookie.Value, tk, func(token *jwt.Token) (interface{}, error) {
 					return []byte(os.Getenv("token_password")), nil
 				})

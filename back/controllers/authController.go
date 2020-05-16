@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"encoding/json"
-	"net/http"
 	"backend/app"
 	"backend/models"
 	u "backend/utils"
+	"encoding/json"
+	"fmt"
+	"net/http"
 )
 
 var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
@@ -41,8 +42,8 @@ var Authenticate = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var IsAuthenticated = func(w http.ResponseWriter, r *http.Request) {
-	resp:=u.Message(200, "ok")
-	u.Respond(w, resp)
+	fmt.Println("is authenticated")
+	u.Respond(w, u.Message(http.StatusOK, "is authenticated"))
 }
 
 var SignOut = func(w http.ResponseWriter, r *http.Request){

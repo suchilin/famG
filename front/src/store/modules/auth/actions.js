@@ -19,12 +19,12 @@ export const doLogin = async ({ commit }, credentials) => {
 export const checkLogin = async ({ commit }) => {
   commit('authFetching', true);
   try {
-    await isAuthenticated()
+    await isAuthenticated();
     commit('onAuthSuccess');
     commit('authFetching', false);
     router.push('/home');
   } catch (error) {
-    commit('onAuthFailure', error);
+    // commit('onAuthFailure', error);
     commit('authFetching', false);
   }
 };

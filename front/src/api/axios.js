@@ -11,9 +11,19 @@ let axiosInstance = axios.create({
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    Accept: 'application/json'
-  }
+    Accept: 'application/json',
+  },
 });
+
+axiosInstance.interceptors.response.use(
+  function (response) {
+    // response data
+    return response;
+  },
+  function (error) {
+    return Promise.reject(error.response.data.message); // transform response.response -> response
+  }
+);
 
 // axiosInstance.interceptors.response.use(null, err => {
 //   const { response, config } = err;

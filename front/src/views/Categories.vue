@@ -9,7 +9,7 @@
             <v-spacer></v-spacer>
 
             <v-btn icon>
-              <v-icon @click="toggleDialog">mdi-plus</v-icon>
+              <v-icon @click="openAddCategoryDialog">mdi-plus</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -31,7 +31,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <category-form dialog="dialog" />
+    <category-form v-model="open" :title="title" />
   </div>
 </template>
 <script>
@@ -41,7 +41,7 @@ import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'Categories',
-  data: () => ({ dialog: false }),
+  data: () => ({ open: false, title: '' }),
   components: {
     CategoryCard,
     CategoryForm,
@@ -53,8 +53,9 @@ export default {
     }),
   },
   methods: {
-    toggleDialog() {
-      this.dialog = !this.dialog;
+    openAddCategoryDialog() {
+      this.title = 'Add Category';
+      this.open = true;
     },
     ...mapActions('categories', ['addCategory']),
   },
